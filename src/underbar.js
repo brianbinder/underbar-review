@@ -330,9 +330,34 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var argsAndResults = [];
+    var testArrayEquality = function(array1, array2) {
+      if (array1.length !== array2.length) {
+        return false;
+      }
+      for (var i = 0; i < array1.length; i++) {
+        if (Array.isArray(array1[i])) {
+          if(!testArrayEquality(array1[i], array2[i])) {
+            return false;
+          }
+        } else if (array1[i] !== array2[i]) {
+          return false;
+        }
+      }
+      return true;
+    };
+    return function() {
+      for (var i = 0; i < argsAndResults.length; i++) {
+        if (testArrayEquality(argsAndResults[i][0], arguments)) {
+          console.log(argsAndResults[i][0]);
+          return argsAndResults[i][1];
+        }
+      }
+      argsAndResults.push([arguments, func.apply(this, arguments)]);
+      return argsAndResults[argsAndResults.length - 1][1];
+    };
 
-
-    //[[[argument1, argument2], result], [arguments, result]]
+    //[[[argument1, argument2], result], [[argument1, argument2], result]]
   };
 
   // Delays a function for the given number of milliseconds, and then calls
