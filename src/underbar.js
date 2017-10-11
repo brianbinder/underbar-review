@@ -337,7 +337,7 @@
       }
       for (var i = 0; i < array1.length; i++) {
         if (Array.isArray(array1[i])) {
-          if(!testArrayEquality(array1[i], array2[i])) {
+          if (!testArrayEquality(array1[i], array2[i])) {
             return false;
           }
         } else if (array1[i] !== array2[i]) {
@@ -349,7 +349,6 @@
     return function() {
       for (var i = 0; i < argsAndResults.length; i++) {
         if (testArrayEquality(argsAndResults[i][0], arguments)) {
-          console.log(argsAndResults[i][0]);
           return argsAndResults[i][1];
         }
       }
@@ -385,6 +384,14 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var copy = Array.from(array) || array.slice(0);
+    var shuffled = [];
+    while (shuffled.length < copy.length) {
+      var randNum = Math.round(Math.random() * copy.length);
+      if (!shuffled.includes(copy[randNum])) {
+        shuffled.push(copy[randNum]);
+      }
+    } return shuffled;
   };
 
 
@@ -399,6 +406,7 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
+
   };
 
   // Sort the object's values by a criterion produced by an iterator.
