@@ -123,7 +123,7 @@
   };
 
 
-/* Mike's failed attempt after finalizing Brian's:
+  /* Mike's failed attempt after finalizing Brian's:
 
   _.uniq = function(array, isSorted, iterator) {
     var mySet = new Set(array);
@@ -197,13 +197,13 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-    var accumWasDefined = false;
+    var accumWasDefined = (arguments.length > 2);
     _.each(collection, function(item) {
-      if (!accumulator  && !accumWasDefined && accumulator !== 0) {
+      if (!accumWasDefined) {
         accumulator = item;
         accumWasDefined = true;
       } else {
-        accumulator = iterator(accumulator, item);
+        accumulator = iterator(accumulator, item, collection);
       }
     });
     return accumulator;
@@ -224,13 +224,26 @@
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
-    // TIP: Try re-using reduce() here.
+    if (arguments.length < 2) {
+      iterator = _.identity;
+    }
+    return _.reduce(collection, function(accum, item) {
+      if (!iterator(item)) {
+        accum = false;
+      }
+      return accum;
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
-    // TIP: There's a very clever way to re-use every() here.
+    if (arguments.length < 2) {
+      iterator = _.identity;
+    }
+    return !_.every(collection, function(item) {
+      return !iterator(item);
+    });
   };
 
 
@@ -253,11 +266,27 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        obj[key] = arguments[i][key];
+      }
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var destKeys = Object.keys(obj);
+    for (var i = 1; i < arguments.length; i++) {
+      for (var key in arguments[i]) {
+        if (!_.contains(destKeys, key)) {
+          obj[key] = arguments[i][key];
+          destKeys.push(key);
+        }
+      }
+    }
+    return obj;
   };
 
 
@@ -301,6 +330,9 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+
+
+    //[[[argument1, argument2], result], [arguments, result]]
   };
 
   // Delays a function for the given number of milliseconds, and then calls
